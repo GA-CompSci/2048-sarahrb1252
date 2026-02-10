@@ -10,13 +10,13 @@ import java.util.Random;
 public class Game {
     private static final int BOARD_SIZE = 4;
     private static final int WIN_VALUE = 2048;
-    
+
     private int[][] board;
     private int score;
     private Random random;
     private boolean hasWon;
     private boolean gameOver;
-    
+
     /**
      * Constructor - initializes a new game
      */
@@ -24,7 +24,7 @@ public class Game {
         random = new Random();
         resetGame();
     }
-    
+
     /**
      * Resets the game to initial state
      */
@@ -33,12 +33,12 @@ public class Game {
         score = 0;
         hasWon = false;
         gameOver = false;
-        
+
         // Add two initial tiles
         addRandomTile();
         addRandomTile();
     }
-    
+
     /**
      * TODO #1: Implement the method to add a random tile to the board
      * Requirements:
@@ -50,10 +50,25 @@ public class Game {
      * Hint: Use random.nextInt(10) < 9 for 90% probability
      */
     private void addRandomTile() {
-        // TODO: Complete this method
-        
+        ArrayList<int[]> emptyCells = getEmptyCells();
+        if (emptyCells.isEmpty())
+            return;
+
+        // Random empty cell
+        int[] spot = emptyCells.get((int) Math.random() * emptyCells.size());
+
+        // 90% 2 10% 4
+        board[spot[0]][spot[1]] = 2;
+
+        if (random.nextInt(10) < 9) {
+            board[spot[0]][spot[1]] = 2;
+        } else {
+            board[spot[0]][spot[1]] = 4;
+        }
+        // turnary opportator
+        // board[spot[0]][spot[1]] = (random.nextInt(10) < 9 ? 2 :4);
     }
-    
+
     /**
      * TODO #2: Implement the method to get all empty cells on the board
      * Requirements:
@@ -63,12 +78,19 @@ public class Game {
      * Hint: Loop through the board and check each cell
      */
     private ArrayList<int[]> getEmptyCells() {
-        // TODO: Complete this method
         ArrayList<int[]> emptyCells = new ArrayList<>();
-        
+        // 2d loop
+
+        for (int row = 0; row < board.length; row++) {
+            for (int col = 0; col < board[0].length; col++) {
+                if (board[row][col] == 0) {
+                    emptyCells.add(new int[] { row, col });
+                }
+            }
+        }
         return emptyCells;
     }
-    
+
     /**
      * TODO #3: Implement the moveLeft method
      * Requirements:
@@ -81,18 +103,57 @@ public class Game {
      * 
      * Algorithm hints:
      * 1. For each row:
-     *    a. Compress tiles to the left (remove zeros)
-     *    b. Merge adjacent equal tiles
-     *    c. Check if the row changed
+     * a. Compress tiles to the left (remove zeros)
+     * b. Merge adjacent equal tiles
+     * c. Check if the row changed
      * 2. If any row changed, add a random tile
      */
     public boolean moveLeft() {
         // TODO: Complete this method
         boolean moved = false;
-        
+
+        // check through every row
+        for (int row = 0; row < board.length; row++) {
+            // temp toll for us to reorganize numbers
+            int[] temp = new int[BOARD_SIZE];
+
+            //smarter copy : only copy non zeros
+            int copyCount = 0;
+            for (int col = 0; col < board[0].length; col++) {
+                // copy values; col should work as a counter for temp
+                if (board[row][col] != 0) temp[copyCount++] = board[row][col];
+
+            }
+            // hard part - merge and stuff?
+            for (int col = 0; col < board[0].length - 1; col++) {
+                // MERGE
+                if (temp[col] == temp[col + 1]) {
+                    temp[col] = temp[col] * 2;
+                    // merged items count for points
+                    score += temp[col];
+                    // scoot everything over once
+                    for (int scoot = col + 1; scoot < board[0].length - 1; scoot++) {
+                        temp[scoot] = temp[scoot + 1];
+                    }
+                    temp[board[0].length - 1] = 0;
+                }
+            }
+
+            // check for differeances
+            for (int col = 0; col < board[0].length; col++) {
+                if (temp[col] != board[row][col]) {
+                    moved = true;
+                    board[row] = temp; // replace row with new values
+                }
+            }
+        }
+        if (moved) {
+            addRandomTile();
+        }
+
         return moved;
     }
-    
+
     /**
      * TODO #4: Implement the moveRight method
      * Requirements:
@@ -105,10 +166,10 @@ public class Game {
     public boolean moveRight() {
         // TODO: Complete this method
         boolean moved = false;
-        
+
         return moved;
     }
-    
+
     /**
      * TODO #5: Implement the moveUp method
      * Requirements:
@@ -121,10 +182,10 @@ public class Game {
     public boolean moveUp() {
         // TODO: Complete this method
         boolean moved = false;
-        
+
         return moved;
     }
-    
+
     /**
      * TODO #6: Implement the moveDown method
      * Requirements:
@@ -135,10 +196,10 @@ public class Game {
     public boolean moveDown() {
         // TODO: Complete this method
         boolean moved = false;
-        
+
         return moved;
     }
-    
+
     /**
      * TODO #7: Implement method to check if the player has won
      * Requirements:
@@ -149,28 +210,28 @@ public class Game {
      */
     public boolean hasWon() {
         // TODO: Complete this method
-        
+
         return false;
     }
-    
+
     /**
      * TODO #8: Implement method to check if game is over
      * Requirements:
      * - Game is over when:
-     *   1. No empty cells remain AND
-     *   2. No adjacent tiles (horizontal or vertical) can be merged
+     * 1. No empty cells remain AND
+     * 2. No adjacent tiles (horizontal or vertical) can be merged
      * - Update the gameOver field when game ends
      * 
      * Hint: First check for empty cells, then check all adjacent pairs
      */
     public boolean isGameOver() {
         // TODO: Complete this method
-        
+
         return false;
     }
-    
+
     // ===================== PROVIDED METHODS - DO NOT MODIFY =====================
-    
+
     /**
      * Gets a copy of the current board state
      */
@@ -183,21 +244,21 @@ public class Game {
         }
         return copy;
     }
-    
+
     /**
      * Gets the current score
      */
     public int getScore() {
         return score;
     }
-    
+
     /**
      * Gets the board size
      */
     public int getBoardSize() {
         return BOARD_SIZE;
     }
-    
+
     /**
      * Helper method for debugging - prints the board to console
      */
