@@ -55,7 +55,7 @@ public class Game {
             return;
 
         // Random empty cell
-        int[] spot = emptyCells.get((int) Math.random() * emptyCells.size());
+        int[] spot = emptyCells.get((int) (Math.random() * emptyCells.size()));
 
         // 90% 2 10% 4
         board[spot[0]][spot[1]] = 2;
@@ -117,11 +117,12 @@ public class Game {
             // temp toll for us to reorganize numbers
             int[] temp = new int[BOARD_SIZE];
 
-            //smarter copy : only copy non zeros
+            // smarter copy : only copy non zeros
             int copyCount = 0;
             for (int col = 0; col < board[0].length; col++) {
                 // copy values; col should work as a counter for temp
-                if (board[row][col] != 0) temp[copyCount++] = board[row][col];
+                if (board[row][col] != 0)
+                    temp[copyCount++] = board[row][col];
 
             }
             // hard part - merge and stuff?
@@ -167,7 +168,40 @@ public class Game {
         // TODO: Complete this method
         boolean moved = false;
 
+        // temp toll for us to reorganize numbers---
+        for (int row = 0; row < board.length; row++) {
+            int[] temp = new int[BOARD_SIZE];
+
+            // smarter copy : only copy non zeros
+            int copyCount = BOARD_SIZE - 1;
+            for (int col = BOARD_SIZE - 1; col > -1; col--) {
+                // copy values; col should work as a counter for temp
+                if (board[row][col] != 0)
+                    temp[copyCount--] = board[row][col];
+            }
+            for (int col = BOARD_SIZE - 1; col > 0; col--) {
+                if (temp[col] == temp[col - 1]) {
+                    temp[col] = temp[col] * 2;
+                    //
+                    score += temp[col];
+                    //
+                    for (int scoot = col - 1; scoot > 0; scoot--) {
+                        temp[scoot] = temp[scoot - 1];
+                    }
+                    temp[BOARD_SIZE - 1] = 0;
+                }
+            }
+            for (int col = 0; col < board[0].length; col++) {
+                if (temp[col] != board[row][col]) {
+                    moved = true;
+                }
+                board[row] = temp; // replace row with new values
+
+            }
+
+        }
         return moved;
+
     }
 
     /**
