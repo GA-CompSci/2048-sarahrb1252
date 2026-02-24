@@ -109,7 +109,6 @@ public class Game {
      * 2. If any row changed, add a random tile
      */
     public boolean moveLeft() {
-        // TODO: Complete this method
         boolean moved = false;
 
         // check through every row
@@ -179,33 +178,37 @@ public class Game {
                 if (board[row][col] != 0)
                     temp[copyCount--] = board[row][col];
             }
+
+            // merge - stop early
             for (int col = BOARD_SIZE - 1; col > 0; col--) {
                 if (temp[col] == temp[col - 1]) {
                     temp[col] = temp[col] * 2;
-                    //
+                    // count the net score
                     score += temp[col];
                     //
                     for (int scoot = col - 1; scoot > 0; scoot--) {
                         temp[scoot] = temp[scoot - 1];
                     }
-                    temp[BOARD_SIZE - 1] = 0;
+                    temp[0] = 0; //
                 }
             }
             for (int col = 0; col < board[0].length; col++) {
                 if (temp[col] != board[row][col]) {
                     moved = true;
+                    board[row] = temp; // replace row with new values
                 }
-                board[row] = temp; // replace row with new values
 
             }
 
         }
-        return moved;
+        if (moved) {
+            addRandomTile();
+        }
+        return moved; // ERROR - ADD RANDOM TILE
 
     }
 
     /**
-     * TODO #5: Implement the moveUp method
      * Requirements:
      * - Similar logic to moveLeft but operates on columns
      * - Slide tiles up
@@ -214,8 +217,47 @@ public class Game {
      * Hint: Work with columns instead of rows
      */
     public boolean moveUp() {
-        // TODO: Complete this method
         boolean moved = false;
+        // temp toll for us to reorganize numbers---
+        for (int col = 0; col < board.length; col++) {
+            int[] temp = new int[BOARD_SIZE];
+
+            // smart copy : copy non 0
+            int copyCount = 0; // start at 0 and work down since we're packing upward
+            for (int row = 0; row < board.length; row++) {
+                // copy vlause
+                if (board[row][col] != 0) {
+                    temp[copyCount++] = board[row][col];
+                }
+            }
+            // merge : stop early
+            for (int row = 0; row < board.length - 1; row++) {
+                if (temp[row] == temp[row + 1]) {
+                    temp[row] = temp[row] * 2;
+                    // calculate score
+                    score += temp[row];
+
+                    for (int scoot = row + 1; scoot < board.length - 1; scoot++) {
+                        temp[scoot] = temp[scoot + 1];
+                    }
+                    temp[board.length - 1] = 0;
+                }
+            }
+            for (int row = 0; row < board.length; row++) {
+                if (temp[row] != board[row][col]) {
+                    moved = true;
+
+                    // copy over manually. We apply the temp value to every column across the rows
+                    for (int r = 0; r < board.length; r++) {
+                        // copy values from temp back to the board
+                        board[r][col] = temp[r];
+                    }
+                }
+            }
+        }
+        if (moved) {
+            addRandomTile();
+        }
 
         return moved;
     }
@@ -231,9 +273,49 @@ public class Game {
         // TODO: Complete this method
         boolean moved = false;
 
-        return moved;
-    }
+        // temp toll for us to reorganize numbers---
+        for (int col = 0; col < board.length; col++) {
+            int[] temp = new int[BOARD_SIZE];
 
+            // smarter copy : only copy non zeros
+            int copyCount = BOARD_SIZE - 1;
+            for (int row = BOARD_SIZE - 1; row > -1; row--) {
+                // copy values; col should work as a counter for temp
+                if (board[row][col] != 0)
+                    temp[copyCount--] = board[row][col];
+            }
+
+            // merge - stop early
+            for (int row = BOARD_SIZE - 1; row > 0; row--) {
+                if (temp[row] == temp[row - 1]) {
+                    temp[row] = temp[row] * 2;
+                    // count the net score
+                    score += temp[row];
+                    //
+                    for (int scoot = row - 1; scoot > 0; scoot--) {
+                        temp[scoot] = temp[scoot - 1];
+                    }
+                    temp[0] = 0; //
+                }
+            }
+            for (int row = 0; row < board.length; row++) {
+                if (temp[row] != board[row][col]) {
+                    moved = true;
+
+                    // copy over manually. We apply the temp value to every column across the rows
+                    for (int r = 0; r < board.length; r++) {
+                        // copy values from temp back to the board
+                        board[r][col] = temp[r];
+                    }
+                }
+            }
+        }
+        if (moved) {
+            addRandomTile();
+        }
+        return moved; // ERROR - ADD RANDOM TILE
+
+    }
     /**
      * TODO #7: Implement method to check if the player has won
      * Requirements:
@@ -260,6 +342,17 @@ public class Game {
      */
     public boolean isGameOver() {
         // TODO: Complete this method
+
+        // if getEmptyCells() size is not 0, return false
+
+        // scan every row, stopping one early
+
+            // scan every column, stopping one early
+
+                // if you've got board[row][col] == board[row+1][col] or
+                // if board[row][col] == board[row][col+1] then return false
+
+        // return true at the end, because you've checked for all cases for it not to be game over
 
         return false;
     }
